@@ -1,5 +1,7 @@
 package de.mineclashtv.tools;
 
+import de.mineclashtv.objects.AnarchyColor;
+import de.mineclashtv.objects.AnarchyResult;
 import de.mineclashtv.palette.Palette;
 
 import javax.imageio.ImageIO;
@@ -14,24 +16,25 @@ import java.util.ArrayList;
  */
 public class Statistics {
 
-    /* TODO remove printf calls, let the main class handle output */
-    public static void getImageStats(File file) throws IOException {
+    public static ArrayList<AnarchyResult> getResults(File file) throws IOException {
         BufferedImage image = ImageIO.read(file);
         ArrayList<Color> colors = SharedUtils.getImagePalette(image);
+        ArrayList<AnarchyResult> results = new ArrayList<>();
 
-        System.out.printf("Found %d colors in %s:\n", colors.size(), file.getName());
         for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
-            int r = color.getRed();
-            int g = color.getGreen();
-            int b = color.getBlue();
-            int rgb = color.getRGB();
+            Color col = colors.get(i);
+            AnarchyColor anarchyColor = Palette.isColorInPalette(col.getRGB()) ?
+                     Palette.getAnarchyColor(col) : new AnarchyColor("Unknown color", col);
 
-            System.out.printf("%d: %s, RGB(%d, %d, %d), %d pixels total, color in PAO palette: %s\n",
-                    i, String.format("#%02X%02X%02X", r, g, b), r, g, b, SharedUtils.getTotalColoredPixels(image, rgb),
-                    Palette.isColorInPalette(rgb) ? Palette.getPalette().get(Palette.getIndexInPalette(rgb)).getName() : "not in palette"
+            AnarchyResult result = new AnarchyResult(
+                    SharedUtils.getTotalColoredPixels(image, col.getRGB()),
+                    anarchyColor
             );
+
+            results.add(result);
         }
+
+        return results;
     }
 
 }

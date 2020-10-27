@@ -1,6 +1,6 @@
 package de.mineclashtv.palette;
 
-import de.mineclashtv.AnarchyColor;
+import de.mineclashtv.objects.AnarchyColor;
 
 import java.awt.Color;
 import java.util.List;
@@ -60,11 +60,7 @@ public class Palette {
     }
 
     public static boolean isColorInPalette(int rgb) {
-        for (AnarchyColor anarchyColor : palette) {
-            if (anarchyColor.getColor().getRGB() == rgb) return true;
-        }
-
-        return false;
+        return getIndexInPalette(rgb) != -1;
     }
 
     public static int getIndexInPalette(int rgb) {
@@ -73,6 +69,12 @@ public class Palette {
         }
 
         return -1; /* color not in palette */
+    }
+
+    public static AnarchyColor getAnarchyColor(Color color) {
+        if(!isColorInPalette(color.getRGB())) return null;
+
+        return palette.get(getIndexInPalette(color.getRGB()));
     }
 
 }

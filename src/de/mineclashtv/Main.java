@@ -1,9 +1,11 @@
 package de.mineclashtv;
 
+import de.mineclashtv.objects.AnarchyResult;
 import de.mineclashtv.tools.Splitter;
 import de.mineclashtv.tools.Statistics;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * @author Pascal Puffke (https://github.com/MineClashTV)
@@ -18,8 +20,13 @@ public class Main {
         }
         splitColors(new File(args[0]));
         */
-        File file = new File("unknown.png");
-        Statistics.getImageStats(file);
+        File file = new File("image.png");
+
+        ArrayList<AnarchyResult> stats = Statistics.getResults(file);
+        for(AnarchyResult result : stats) {
+            //System.out.println(result.toString());
+            System.out.printf("%dx %s (%s)\n", result.getCount(), result.getColorName(), result.getColorHex());
+        }
         Splitter.splitColors(file);
     }
 
