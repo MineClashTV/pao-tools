@@ -20,6 +20,12 @@ import java.util.Objects;
  */
 public class Main {
 
+    /*
+    TODO add some kind of interface
+    TODO better splitting algorithms
+    TODO better efficiency; less iterations over the image
+     */
+
     public static void main(String[] args) throws IOException {
         File file = new File("sampleinput.png");
 
@@ -32,9 +38,10 @@ public class Main {
         for (BufferedImage split : splits) {
             /* Color may be null when image only consists of fully transparent pixels. I don't care though. */
             Color color = SharedUtils.getFirstColor(split);
-            AnarchyColor anarchyColor = Palette.isColorInPalette(Objects.requireNonNull(color).getRGB()) ?
-                    Palette.getAnarchyColor(color.getRGB()) : new AnarchyColor("Unknown color", color);
-            File imageFile = new File(anarchyColor.getName() + ".png");
+            int rgb = Objects.requireNonNull(color).getRGB();
+            AnarchyColor anarchyColor = Palette.isColorInPalette(rgb) ?
+                    Palette.getAnarchyColor(rgb) : new AnarchyColor("Unknown color", color);
+            File imageFile = new File(anarchyColor.getName() + " - " + SharedUtils.getTotalColoredPixels(split, rgb) + ".png");
 
             ImageIO.write(split, "png", imageFile);
 
