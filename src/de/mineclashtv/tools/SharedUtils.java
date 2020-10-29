@@ -41,4 +41,24 @@ public class SharedUtils {
 
         return result;
     }
+
+    /**
+     * @param image source image
+     * @return whatever color of the first non-transparent pixel, null if there is none
+     */
+    public static Color getFirstColor(BufferedImage image) {
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int rgb = image.getRGB(x, y);
+                if((rgb >> 24) != 0x00) /* checking for non-transparency */
+                    return new Color(rgb);
+            }
+        }
+
+        return null;
+    }
+
+    public static String getHexFromColor(Color color) {
+        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+    }
 }

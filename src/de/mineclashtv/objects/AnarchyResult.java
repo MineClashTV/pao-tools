@@ -1,5 +1,7 @@
 package de.mineclashtv.objects;
 
+import de.mineclashtv.tools.SharedUtils;
+
 import java.awt.Color;
 
 public class AnarchyResult {
@@ -12,7 +14,7 @@ public class AnarchyResult {
         this.anarchyColor = color;
         Color col = anarchyColor.getColor(); /* don't get these in the wrong order... */
 
-        this.colorHex = String.format("#%02X%02X%02X", col.getRed(), col.getGreen(), col.getBlue());
+        this.colorHex = SharedUtils.getHexFromColor(col);
         this.colorName = anarchyColor.getName();
         this.count = count;
     }

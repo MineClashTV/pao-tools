@@ -1,12 +1,7 @@
 package de.mineclashtv.tools;
 
-import de.mineclashtv.palette.Palette;
-
-import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -14,15 +9,18 @@ import java.util.ArrayList;
  */
 public class Splitter {
 
-    /* TODO split this up more (no pun intended). this function does too much */
-    public static void splitColors(File file) throws IOException {
-        BufferedImage image = ImageIO.read(file);
+    /**
+     * Splits given image in every color with a transparent background.
+     * @param image source image
+     * @return ArrayList containing BufferedImages, one for each color
+     */
+    public static ArrayList<BufferedImage> getSimpleSplit(BufferedImage image) {
         ArrayList<Color> colors = SharedUtils.getImagePalette(image);
+        ArrayList<BufferedImage> result = new ArrayList<>();
         int width = image.getWidth();
         int height = image.getHeight();
 
-        for (int i = 0; i < colors.size(); i++) {
-            Color color = colors.get(i);
+        for (Color color : colors) {
             BufferedImage outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             int rgbColor = color.getRGB();
 
@@ -35,17 +33,9 @@ public class Splitter {
                 }
             }
 
-            File outputFile = new File("output-" + i + ".png");
-            ImageIO.write(outputImage, "png", outputFile);
-
-            int index = Palette.getIndexInPalette(rgbColor);
-            if (index == -1) {
-                String hex = String.format("%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
-                System.out.printf("WARNING: Color %d not in palette: #%s. File saved as %s\n", i, hex, outputFile.getName());
-            } else {
-                String colorName = Palette.getPalette().get(index).getName();
-                System.out.printf("Successfully exported color %d (%s) as %s\n", i, colorName, outputFile.getName());
-            }
+            result.add(outputImage);
         }
+
+        return result;
     }
 }
