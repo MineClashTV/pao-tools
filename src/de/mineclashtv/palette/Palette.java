@@ -24,9 +24,9 @@ public class Palette {
             new AnarchyColor("Red 1", new Color(-10548454)),
             new AnarchyColor("Red 2", new Color(-6745832)),
             new AnarchyColor("Red 3", new Color(-65536)),
-            new AnarchyColor("Dark Orange", new Color(-41216)),
-            new AnarchyColor("Orange", new Color(-28672)),
-            new AnarchyColor("Light Orange", new Color(-14848)),
+            new AnarchyColor("Orange 1", new Color(-41216)),
+            new AnarchyColor("Orange 2", new Color(-28672)),
+            new AnarchyColor("Orange 3", new Color(-14848)),
             new AnarchyColor("Yellow", new Color(-203)),
             new AnarchyColor("Green 4", new Color(-12321280)),
             new AnarchyColor("Green 3", new Color(-16723968)),
@@ -67,7 +67,6 @@ public class Palette {
         for (int i = 0; i < palette.size(); i++) {
             if (palette.get(i).getColor().getRGB() == rgb) return i;
         }
-
         return -1; /* color not in palette */
     }
 

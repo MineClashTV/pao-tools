@@ -4,8 +4,8 @@ import java.awt.Color;
 
 public class AnarchyColor {
 
-    private Color color;
-    private String name;
+    private final Color color;
+    private final String name;
 
     public AnarchyColor(String name, Color color) {
        this.color = color;

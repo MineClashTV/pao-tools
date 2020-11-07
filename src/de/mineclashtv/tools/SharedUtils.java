@@ -9,18 +9,22 @@ import java.util.ArrayList;
  */
 public class SharedUtils {
 
+    public static int[] getImageData(BufferedImage image) {
+        return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+    }
+
     /**
      * @param image source image
      * @param rgb RGB value representing color in default sRGB color model
      * @return the amount of pixels in given image that are of the exact rgb value
      */
     public static int getTotalColoredPixels(BufferedImage image, int rgb) {
+        int[] data = getImageData(image);
         int answer = 0;
 
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                if (image.getRGB(x, y) == rgb)
-                    answer++;
+        for(int a : data) {
+            if(rgb == a) {
+                answer++;
             }
         }
 
@@ -28,18 +32,18 @@ public class SharedUtils {
     }
 
     public static ArrayList<Color> getImagePalette(BufferedImage image) {
-        ArrayList<Color> result = new ArrayList<>();
+        int[] data = getImageData(image);
+        ArrayList<Color> answer = new ArrayList<>();
 
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                Color color = new Color(image.getRGB(x, y));
+        for(int a : data) {
+            Color color = new Color(a);
 
-                if (!result.contains(color))
-                    result.add(color);
+            if(!answer.contains(color)) {
+                answer.add(color);
             }
         }
 
-        return result;
+        return answer;
     }
 
     /**
@@ -47,11 +51,11 @@ public class SharedUtils {
      * @return whatever color of the first non-transparent pixel, null if there is none
      */
     public static Color getFirstColor(BufferedImage image) {
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
-                int rgb = image.getRGB(x, y);
-                if((rgb >> 24) != 0x00) /* checking for non-transparency */
-                    return new Color(rgb);
+        int[] data = getImageData(image);
+
+        for(int a : data) {
+            if((a >> 24) != 0x00) {
+                return new Color(a);
             }
         }
 

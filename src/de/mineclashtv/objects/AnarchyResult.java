@@ -6,9 +6,9 @@ import java.awt.Color;
 
 public class AnarchyResult {
 
-    private AnarchyColor anarchyColor;
-    private String colorHex, colorName;
-    private int count;
+    private final AnarchyColor anarchyColor;
+    private final String colorHex, colorName;
+    private final int count;
 
     public AnarchyResult(int count, AnarchyColor color) {
         this.anarchyColor = color;

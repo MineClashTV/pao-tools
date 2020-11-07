@@ -12,6 +12,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -27,7 +29,8 @@ public class Main {
      */
 
     public static void main(String[] args) throws IOException {
-        File file = new File("sampleinput.png");
+        File file = new File("Ancient Enemy.png"); // put path to png here
+        Files.createDirectory(Paths.get(file.getName().replace(".png", "")));
 
         ArrayList<AnarchyResult> stats = Statistics.getResults(ImageIO.read(file));
         for (AnarchyResult result : stats) {
@@ -36,12 +39,11 @@ public class Main {
 
         ArrayList<BufferedImage> splits = Splitter.getSimpleSplit(ImageIO.read(file));
         for (BufferedImage split : splits) {
-            /* Color may be null when image only consists of fully transparent pixels. I don't care though. */
             Color color = SharedUtils.getFirstColor(split);
             int rgb = Objects.requireNonNull(color).getRGB();
             AnarchyColor anarchyColor = Palette.isColorInPalette(rgb) ?
                     Palette.getAnarchyColor(rgb) : new AnarchyColor("Unknown color", color);
-            File imageFile = new File(anarchyColor.getName() + " - " + SharedUtils.getTotalColoredPixels(split, rgb) + ".png");
+            File imageFile = new File(file.getName().replace(".png", "") + "/" + anarchyColor.getName() + " - " + SharedUtils.getTotalColoredPixels(split, rgb) + ".png");
 
             ImageIO.write(split, "png", imageFile);
 
