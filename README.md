@@ -1,17 +1,24 @@
 # pao-tools
 
-**NOTICE: I stopped developing this tool as I have lost interest in the game. Feel free to fork and modify this as you wish.**
+For the two remaining pixelanarchy players among us.
 
-A few simple tools for getting statistics about your projects and image splitting functionality.
+![Preview](preview.png)
+
+## Tools:
+
+- Converting images to the PAO color palette
+- Floyd-Steinberg dithering
+- Scaling images down
+- Splitting images by their colors
 
 ## Usage
-There is no interface yet - get the source, change the stuff, and pray for it to work.
 
-## Development
-This ~is still~ once was under heavy development and things ~will~ won't get better eventually.
-~Contributions~ Forks welcome!
+This program requires Java 15 and offers no graphical interface. As of now, you have to use the interactive CLI.
 
-TODOs:
-  - Higher efficiency; less iterations over image. As of right now, running this program on a 34 color image needs 104 iterations.
-  - Make it usable for the average player; web interface or GUI.
-  - More splitting algorithms; currently only splits colors as they are with transparent BGs. Works for me, but I know some people prefer to work differently.
+1. Make sure you have JRE / JDK 15 installed. Check with the command ```java --version```.
+
+If it shows an older version, then install the ```jdk-openjdk``` package in Linux. Windows users may get it from https://adoptopenjdk.net/releases.html?variant=openjdk15&jvmVariant=hotspot
+
+2. In a terminal, cd to the directory where the jar file is located and type ```java -jar pao-tools*.jar```
+
+3. Follow the instructions, should be self-explanatory. Paths can be relative (e.g. "image.png") or direct (e.g. "/home/user/image.png")

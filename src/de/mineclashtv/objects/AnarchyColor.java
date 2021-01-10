@@ -16,7 +16,6 @@ public class AnarchyColor {
         return color;
     }
 
-
     public String getName() {
         return name;
     }
