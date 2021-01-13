@@ -1,8 +1,10 @@
 package de.mineclashtv.ui;
 
+import de.mineclashtv.Main;
 import de.mineclashtv.objects.AnarchyColor;
 import de.mineclashtv.palette.Palette;
 import de.mineclashtv.tools.SharedUtils;
+import de.mineclashtv.tools.blurring.BoxBlur;
 import de.mineclashtv.tools.palettizing.DitheringAlgorithm;
 import de.mineclashtv.tools.palettizing.Palettizer;
 import de.mineclashtv.tools.scaling.Scaler;
@@ -14,11 +16,19 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Scanner;
 
 // This is a mess.
 public class CLI {
+
+    /*
+    The complete process:
+    1. Scale the image down to a target width.
+    2. Convert it to the PAO palette and apply floyd-steinberg dithering
+    3. Use the same scaled image from step 1 and blur it, 2px radius 1 iteration
+    4. Convert the blurred image to the PAO palette without applying dithering
+    5. Optionally split all colors from the dithered image to separate files
+     */
 
     private final Palettizer palettizer;
     private final Scaler scaler;
@@ -30,17 +40,19 @@ public class CLI {
     private File inputFile;
     private BufferedImage inputImage;
     private DitheringAlgorithm algorithm;
+    private BoxBlur blur;
 
     public CLI() {
         this.palettizer = new Palettizer(Palette.getPalette());
         this.scaler = new Scaler(Scalr.Method.ULTRA_QUALITY);
         this.splitter = new Splitter();
         this.scanner = new Scanner(System.in);
+        this.blur = new BoxBlur(2, 1);
     }
 
-    public void start() throws IOException {
+    public void run() throws IOException {
         System.out.println("_".repeat(25));
-        System.out.println(center("pao-tools", 25));
+        System.out.println(center("pao-tools " + Main.version, 25));
         System.out.println("_".repeat(25));
         System.out.print("Path to image: ");
 
@@ -49,6 +61,7 @@ public class CLI {
 
         if(this.inputImage == null) {
             System.err.println("Not an image: " + inputFile.getAbsolutePath());
+
             return;
         }
 
@@ -58,11 +71,12 @@ public class CLI {
         if(this.inputImage.getWidth() < targetWidth) {
             System.err.printf("Image width is smaller than target width: %d < %d\n",
                     this.inputImage.getWidth(), targetWidth);
+
             return;
         }
 
         System.out.print("\nUse dithering? (y/n): ");
-        this.algorithm = scanner.next().toLowerCase(Locale.ROOT).equals("y") ?
+        this.algorithm = scanner.next().equalsIgnoreCase("y") ?
                 DitheringAlgorithm.FLOYD_STEINBERG : DitheringAlgorithm.NONE;
 
         if(this.algorithm == DitheringAlgorithm.FLOYD_STEINBERG) {
@@ -70,6 +84,7 @@ public class CLI {
             this.predither = scanner.next().equalsIgnoreCase("y");
         }
 
+        long dither_timeA = System.currentTimeMillis();
         final BufferedImage resultImage = palettizer.generateImage(
                 scaler.scaleImage(inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth), algorithm);
         final File resultFile = new File(
@@ -77,21 +92,34 @@ public class CLI {
 
         ImageIO.write(resultImage, "png", resultFile);
 
-        System.out.println("\nSaved image as " + resultFile.getName());
+        System.out.printf(
+                "\nSaved image as %s in %dms\n",
+                resultFile.getName(),
+                (int)(System.currentTimeMillis() - dither_timeA)
+        );
 
         if(this.predither) {
-            final BufferedImage preditherImage = palettizer.generateImage(
-                    scaler.scaleImage(inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth), DitheringAlgorithm.NONE);
+            long predither_timeA = System.currentTimeMillis();
+            final BufferedImage preditherImage =
+                    palettizer.generateImage(
+                            blur.blurImage(
+                                    scaler.scaleImage(
+                                            inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth)
+                            ), DitheringAlgorithm.NONE);
             final File preditherFile = new File(
                     inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "-pre-pao.png");
 
             ImageIO.write(preditherImage, "png", preditherFile);
 
-            System.out.println("Saved predither as " + preditherFile.getName());
+            System.out.printf(
+                    "Saved predither as %s in %dms\n",
+                    preditherFile.getName(),
+                    (int)(System.currentTimeMillis() - predither_timeA)
+            );
         }
 
         System.out.print("\nSplit all colors into separate files? (y/n): ");
-        if(scanner.next().toLowerCase(Locale.ROOT).equals("y")) {
+        if(scanner.next().equalsIgnoreCase("y")) {
             splitter.getSimpleSplit(resultImage).forEach(split -> {
                 Color color = SharedUtils.getFirstColor(split);
                 int rgb = color.getRGB();
@@ -118,6 +146,13 @@ public class CLI {
                 );
             });
         }
+
+        System.out.printf(
+                "\nDone.\nFinal image: %dx%d pixels (%d total)\n",
+                resultImage.getWidth(),
+                resultImage.getHeight(),
+                resultImage.getWidth() * resultImage.getHeight()
+        );
     }
 
     private String center(String input, int targetWidth) {

@@ -9,13 +9,11 @@ import java.io.IOException;
  */
 public class Main {
 
-    /*
-    TODO clean up literally every single line of this project. this is one giant mess
-     */
+	public static final String version = "1.1.0";
 
 	public static void main(String[] args) throws IOException {
 		CLI cli = new CLI();
-		cli.start();
+		cli.run();
 	}
 
 }
