@@ -1,0 +1,22 @@
+1.1.0
+  - Drastically improved the predither algorithm.
+    It now uses a slight box blur before converting the colors, giving a less complex result.
+
+  - CLI now shows program version
+
+  - CLI now shows the time it took to convert images
+
+  - CLI now shows the final resolution and total pixel count of the generated image(s)
+
+1.0.0
+  - First usable version!
+
+  - Floyd-Steinberg dithering algorithm
+
+  - Splitting images by colors
+
+  - Scaling down images
+
+  - Very basic predithering
+
+  - Basic interactive commandline interface

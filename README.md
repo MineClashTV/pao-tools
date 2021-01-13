@@ -10,6 +10,7 @@ For the two remaining pixelanarchy players among us.
 - Floyd-Steinberg dithering
 - Scaling images down
 - Splitting images by their colors
+- Generating proper predither images using a box blur algorithm
 
 ## Usage
 
@@ -22,3 +23,7 @@ If it shows an older version, then install the ```jdk-openjdk``` package in Linu
 2. In a terminal, cd to the directory where the jar file is located and type ```java -jar pao-tools*.jar```
 
 3. Follow the instructions, should be self-explanatory. Paths can be relative (e.g. "image.png") or direct (e.g. "/home/user/image.png")
+
+## Build and dev dependencies
+
+Image scaling functionality is based on the [imgscalr 4.2](https://github.com/rkalla/imgscalr) library.
