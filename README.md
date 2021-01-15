@@ -26,10 +26,10 @@ If it shows an older version, then install the ```jdk-openjdk``` package in Linu
 
 ## Quick explanations
 
-**Path to image: **The full path for the source image (e.g. /home/user/image.png, or Windows-style C:\Users\user\image.png, you get the idea).
+**Path to image**: The full path for the source image (e.g. /home/user/image.png, or Windows-style C:\Users\user\image.png, you get the idea).
 Just typing out the filename suffices as well if the file is located in the same directory as the project / the .jar file.
 
-**Target width: **How big the image should be in its width. The height will be fittingly calculated to keep the source image's proportions.
+**Target width**: How big the image should be in its width. The height will be fittingly calculated to keep the source image's proportions.
 You should keep this low enough to not cause you to give up, but high enough to keep the image detailed enough. Experiment around and find your optimal size that does not cause you to lose sanity.
 
 If you think the source image already is small enough, or you just like to see how it would look like, you can input 0 and the original resolution will be kept.
