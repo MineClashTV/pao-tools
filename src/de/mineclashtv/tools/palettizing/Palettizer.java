@@ -41,6 +41,8 @@ public class Palettizer {
      * @see DitheringAlgorithm
      */
     public BufferedImage generateImage(BufferedImage input, DitheringAlgorithm algorithm) {
+        long a = System.currentTimeMillis();
+
         int w = input.getWidth();
         int h = input.getHeight();
         final BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_INDEXED, indexColorModel);
@@ -78,6 +80,7 @@ public class Palettizer {
                             pixels[y + 1][x + 1] = pixels[y + 1][x + 1].add(quantError.mul(1. / 16));
                     }
                 }
+
                 return result;
             default:
                 return null;

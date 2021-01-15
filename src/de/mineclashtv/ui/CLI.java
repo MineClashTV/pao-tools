@@ -34,20 +34,20 @@ public class CLI {
     private final Scaler scaler;
     private final Splitter splitter;
     private final Scanner scanner;
+    private final BoxBlur blur;
 
     private boolean predither;
-    private int targetWidth;
-    private File inputFile;
-    private BufferedImage inputImage;
+    private int targetWidth, blurRadius;
+    private File inputFile, resultFile;
+    private BufferedImage inputImage, resultImage;
     private DitheringAlgorithm algorithm;
-    private BoxBlur blur;
 
     public CLI() {
-        this.palettizer = new Palettizer(Palette.getPalette());
-        this.scaler = new Scaler(Scalr.Method.ULTRA_QUALITY);
-        this.splitter = new Splitter();
-        this.scanner = new Scanner(System.in);
-        this.blur = new BoxBlur(2, 1);
+        this.palettizer     = new Palettizer(Palette.getPalette());
+        this.scaler         = new Scaler(Scalr.Method.ULTRA_QUALITY);
+        this.splitter       = new Splitter();
+        this.scanner        = new Scanner(System.in);
+        this.blur           = new BoxBlur(2, 1);
     }
 
     public void run() throws IOException {
@@ -84,75 +84,93 @@ public class CLI {
             this.predither = scanner.next().equalsIgnoreCase("y");
         }
 
+        generateMain();
+
+        if(this.predither)
+            predither();
+
+        System.out.print("\nSplit all colors into separate files? (y/n): ");
+        if(scanner.next().equalsIgnoreCase("y"))
+            splitColors();
+
+        System.out.printf(
+                "\n[Done.]\n[Final image: %dx%d pixels (%d total)]\n",
+                resultImage.getWidth(),
+                resultImage.getHeight(),
+                resultImage.getWidth() * resultImage.getHeight()
+        );
+    }
+
+    // To clean up the run() method, dump all of the functionality into their own methods.
+
+    private void generateMain() throws IOException {
         long dither_timeA = System.currentTimeMillis();
-        final BufferedImage resultImage = palettizer.generateImage(
+
+        this.resultImage = palettizer.generateImage(
                 scaler.scaleImage(inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth), algorithm);
-        final File resultFile = new File(
+        this.resultFile = new File(
                 inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "-pao.png");
 
         ImageIO.write(resultImage, "png", resultFile);
 
         System.out.printf(
-                "\nSaved image as %s in %dms\n",
+                "\n[Saved image as %s in %dms]\n",
                 resultFile.getName(),
                 (int)(System.currentTimeMillis() - dither_timeA)
         );
+    }
 
-        if(this.predither) {
-            long predither_timeA = System.currentTimeMillis();
-            final BufferedImage preditherImage =
-                    palettizer.generateImage(
-                            blur.blurImage(
-                                    scaler.scaleImage(
-                                            inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth)
-                            ), DitheringAlgorithm.NONE);
-            final File preditherFile = new File(
-                    inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "-pre-pao.png");
+    private void predither() throws IOException {
+        System.out.print("\nEnter blur radius, bigger = less complex result (default 2): ");
+        this.blur.setRadius(scanner.nextInt());
 
-            ImageIO.write(preditherImage, "png", preditherFile);
+        long predither_timeA = System.currentTimeMillis();
 
-            System.out.printf(
-                    "Saved predither as %s in %dms\n",
-                    preditherFile.getName(),
-                    (int)(System.currentTimeMillis() - predither_timeA)
-            );
-        }
+        // What is this nightmare
+        final BufferedImage preditherImage =
+                palettizer.generateImage(
+                        blur.blurImage(
+                                scaler.scaleImage(
+                                        inputImage, targetWidth == 0 ? inputImage.getWidth() : targetWidth)
+                        ), DitheringAlgorithm.NONE);
+        final File preditherFile = new File(
+                inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "-pre-pao.png");
 
-        System.out.print("\nSplit all colors into separate files? (y/n): ");
-        if(scanner.next().equalsIgnoreCase("y")) {
-            splitter.getSimpleSplit(resultImage).forEach(split -> {
-                Color color = SharedUtils.getFirstColor(split);
-                int rgb = color.getRGB();
-                AnarchyColor anarchyColor = Palette.isColorInPalette(rgb) ?
-                        Palette.getAnarchyColor(rgb) : new AnarchyColor("Unknown color", color);
-
-                File imageFile = new File(
-                        String.format("%s - %d.png",
-                                anarchyColor.getName(),
-                                SharedUtils.getTotalColoredPixels(split, rgb)
-                        )
-                );
-
-                try {
-                    ImageIO.write(split, "png", imageFile);
-                } catch (IOException exception) {
-                    exception.printStackTrace();
-                }
-
-                System.out.printf("Saved color %s (%s) as %s\n",
-                        anarchyColor.getName(),
-                        SharedUtils.getHexFromColor(color),
-                        imageFile.getName()
-                );
-            });
-        }
+        ImageIO.write(preditherImage, "png", preditherFile);
 
         System.out.printf(
-                "\nDone.\nFinal image: %dx%d pixels (%d total)\n",
-                resultImage.getWidth(),
-                resultImage.getHeight(),
-                resultImage.getWidth() * resultImage.getHeight()
+                "\n[Saved predither as %s in %dms]\n",
+                preditherFile.getName(),
+                (int)(System.currentTimeMillis() - predither_timeA)
         );
+    }
+
+    private void splitColors() {
+        splitter.getSimpleSplit(resultImage).forEach(split -> {
+            Color color = SharedUtils.getFirstColor(split);
+            int rgb = color.getRGB();
+            AnarchyColor anarchyColor = Palette.isColorInPalette(rgb) ?
+                    Palette.getAnarchyColor(rgb) : new AnarchyColor("Unknown color", color);
+
+            File imageFile = new File(
+                    String.format("%s - %d.png",
+                            anarchyColor.getName(),
+                            SharedUtils.getTotalColoredPixels(split, rgb)
+                    )
+            );
+
+            try {
+                ImageIO.write(split, "png", imageFile);
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+
+            System.out.printf("[Saved color %s (%s) as %s]\n",
+                    anarchyColor.getName(),
+                    SharedUtils.getHexFromColor(color),
+                    imageFile.getName()
+            );
+        });
     }
 
     private String center(String input, int targetWidth) {

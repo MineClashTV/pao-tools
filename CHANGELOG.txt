@@ -1,3 +1,12 @@
+1.2.0
+  - Blur radius for predither is now user-definable
+    Default radius is 2 (pixels). Bigger radius blurs the input image more, which yields less
+    detailed and therefore less painful to draw predither images.
+
+  - Slight performance improvement when downscaling the input image is not wanted
+
+  - Minor code improvements
+
 1.1.0
   - Drastically improved the predither algorithm.
     It now uses a slight box blur before converting the colors, giving a less complex result.

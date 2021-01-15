@@ -6,9 +6,9 @@ import java.awt.image.BufferedImage;
 
 public class BoxBlur {
 
-    private final int hRadius;
-    private final int vRadius;
-    private final int iterations;
+    private int hRadius;
+    private int vRadius;
+    private int iterations;
 
     public BoxBlur(int radius, int iterations) {
         this.hRadius = radius;
@@ -71,14 +71,8 @@ public class BoxBlur {
                         (divide[tg] << 8) |
                         divide[tb];
 
-                int i1 = x + radius + 1;
-                if(i1 > w - 1)
-                    i1 = w - 1;
-                int i2 = x - radius;
-                if(i2 < 0)
-                    i2 = 0;
-                int rgb1 = in[inIndex + i1];
-                int rgb2 = in[inIndex + i2];
+                int rgb1 = in[inIndex + Math.min(x + radius + 1, w -1)];
+                int rgb2 = in[inIndex + Math.max(x - radius, 0)];
 
                 ta += ((rgb1 >> 24) & 0xFF)-((rgb2 >> 24) & 0xFF);
                 tr += ((rgb1 & 0xFF0000)-(rgb2 & 0xFF0000)) >> 16;
@@ -89,6 +83,35 @@ public class BoxBlur {
 
             inIndex += w;
         }
+    }
+
+    public void setRadius(int radius) {
+        this.sethRadius(radius);
+        this.setvRadius(radius);
+    }
+
+    public void sethRadius(int hRadius) {
+        this.hRadius = hRadius;
+    }
+
+    public void setvRadius(int vRadius) {
+        this.vRadius = vRadius;
+    }
+
+    public void setIterations(int iterations) {
+        this.iterations = iterations;
+    }
+
+    public int gethRadius() {
+        return hRadius;
+    }
+
+    public int getvRadius() {
+        return vRadius;
+    }
+
+    public int getIterations() {
+        return iterations;
     }
 
     private int clamp(int x, int a, int b) {

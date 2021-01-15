@@ -29,6 +29,10 @@ public class Scaler {
                     width
             ));
 
+        // Skip processing if no scaling is needed.
+        if(input.getWidth() == width)
+            return input;
+
         BufferedImage result = Scalr.resize(input, scalingMethod, width);
 
         input.flush();
@@ -36,29 +40,4 @@ public class Scaler {
         return result;
     }
 
-    /**
-     * Scales an image down to a target width and height using the scaling method given in the constructor.
-     *
-     * @param input Input image
-     * @param width Target width
-     * @param height Target height
-     * @return Scaled image
-     * @throws IllegalArgumentException if the input image dimensions are smaller than the target dimensions
-     */
-    public BufferedImage scaleImage(BufferedImage input, int width, int height) throws IllegalArgumentException {
-        if(input.getWidth() < width || input.getHeight() < height)
-            throw new IllegalArgumentException(String.format(
-                    "Input image dimensions smaller than target dimensions: %dx%d < %dx%d",
-                    input.getWidth(),
-                    input.getHeight(),
-                    width,
-                    height
-            ));
-
-        BufferedImage result = Scalr.resize(input, scalingMethod, width, height);
-
-        input.flush();
-
-        return result;
-    }
 }
