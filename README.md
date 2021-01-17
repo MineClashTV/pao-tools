@@ -4,7 +4,10 @@ For the two remaining pixelanarchy players among us.
 
 ![Preview](preview.png)
 
-## Tools:
+## Notice
+Sadly, the game is no more. I'm leaving this repo online, but you won't need it for its originally intended purpose.
+
+## Tools
 
 - Converting images to the PAO color palette
 - Floyd-Steinberg dithering
